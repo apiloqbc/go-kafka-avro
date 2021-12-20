@@ -35,7 +35,8 @@ func NewAvroConsumer(kafkaServers []string, schemaRegistryServers []string,
 	topic string, groupId string, callbacks ConsumerCallbacks) (*avroConsumer, error) {
 	// init (custom) config, enable errors and notifications
 	config := cluster.NewConfig()
-	config.Consumer.Fetch.Max = 0
+	config.Consumer.Fetch.Max = 2147483647
+	config.Consumer.Fetch.Default = 2147483647
 	config.Consumer.Return.Errors = true
 	config.Group.Return.Notifications = true
 	//read from beginning at the first time
