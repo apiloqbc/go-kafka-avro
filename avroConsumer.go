@@ -37,7 +37,6 @@ func NewAvroConsumer(kafkaServers []string, schemaRegistryServers []string,
 	config := cluster.NewConfig()
 
 
-	NewAvroConsumer
 	config.Consumer.Fetch.Max = 2147483647
 	config.Consumer.Return.Errors = true
 	config.Group.Return.Notifications = true
