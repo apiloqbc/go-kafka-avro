@@ -15,10 +15,10 @@ type Config struct {
 	Username string `envconfig:"KAFKA_USERNAME"`
 	Password string `envconfig:"KAFKA_PASSWORD"`
 
-	Brokers  string `envconfig:"KAFKA_BROKERS"`
-	Version  string `envconfig:"KAFKA_VERSION"`
-	Verbose  bool   `envconfig:"KAFKA_VERBOSE"`
-	ClientID string `envconfig:"KAFKA_CLIENT_ID"`
+	Brokers  []string `envconfig:"KAFKA_BROKERS"`
+	Version  string   `envconfig:"KAFKA_VERSION"`
+	Verbose  bool     `envconfig:"KAFKA_VERBOSE"`
+	ClientID string   `envconfig:"KAFKA_CLIENT_ID"`
 
 	TLSEnabled bool   `envconfig:"KAFKA_TLS_ENABLED"`
 	TLSKey     string `envconfig:"KAFKA_TLS_KEY"`
@@ -35,13 +35,13 @@ type Config struct {
 	FlushInterval    time.Duration `envconfig:"KAFKA_FLUSH_INTERVAL"`
 	SaslMechanism    string        `envconfig:"KAFKA_SASL_MECHANISM"`
 	SaslEnabled      bool          `envconfig:"KAFKA_SASL_ENABLED"`
-	SchemaRegistries string        `envconfig:"KAFKA_SCHEMA_REGISTRIES"`
+	SchemaRegistries []string      `envconfig:"KAFKA_SCHEMA_REGISTRIES"`
 }
 
 // returns a new kafka.Config with reasonable defaults for some values
 func NewKafkaConfig() Config {
 	return Config{
-		Brokers:           "localhost:9092",
+		Brokers:           []string{"localhost:9092"},
 		Version:           "1.1.0",
 		ClientID:          "sarama-easy",
 		RebalanceStrategy: "roundrobin",

@@ -19,21 +19,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	// apply minimal config only for example run
-	flag.StringVar(&conf.Brokers, "brokers", conf.Brokers, "CSV list of Kafka seed brokers")
-	flag.StringVar(&conf.SchemaRegistries, "schema-registries", conf.SchemaRegistries, "CSV list of Kafka schema registries")
-	flag.StringVar(&topic, "topic", "events", "CSV list of Kafka topics to consume")
-	flag.BoolVar(&conf.Verbose, "verbose", conf.Verbose, "Enable detailed logging of Kafka client internals")
-	flag.BoolVar(&conf.TLSEnabled, "tls-enabled", conf.TLSEnabled, "Enable TLS encryption")
-	flag.BoolVar(&conf.SaslEnabled, "sasl-enabled", conf.SaslEnabled, "Enable SASL authentication")
-	flag.StringVar(&conf.Username, "username", conf.Username, "Kafka SASL Username")
-	flag.StringVar(&conf.Password, "password", conf.Password, "Kafka SASL Password")
-	flag.StringVar(&conf.SaslMechanism, "sasl-mechanism", conf.SaslMechanism, "SASL Mechanism to use for authentication")
-
-	flag.Parse()
-
-	log.Printf("Config: %+v\n", conf)
 }
 
 var topic = "test"

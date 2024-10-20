@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"github.com/Shopify/sarama"
 	"github.com/linkedin/goavro/v2"
-	"strings"
 	"time"
 )
 
@@ -32,11 +31,11 @@ func NewAvroProducer(kafkaConfig Config) (*AvroProducer, error) {
 	if err := configureProducerTLS(kafkaConfig, config); err != nil {
 		return nil, err
 	}
-	producer, err := sarama.NewSyncProducer(strings.Split(kafkaConfig.Brokers, ","), config)
+	producer, err := sarama.NewSyncProducer(kafkaConfig.Brokers, config)
 	if err != nil {
 		return nil, err
 	}
-	schemaRegistryClient := NewCachedSchemaRegistryClient(strings.Split(kafkaConfig.SchemaRegistries, ","))
+	schemaRegistryClient := NewCachedSchemaRegistryClient(kafkaConfig.SchemaRegistries)
 	return &AvroProducer{producer, schemaRegistryClient}, nil
 }
 

@@ -7,7 +7,6 @@ import (
 	"github.com/linkedin/goavro/v2"
 	"os"
 	"os/signal"
-	"strings"
 )
 
 type avroConsumer struct {
@@ -50,12 +49,12 @@ func NewAvroConsumer(kafkaConfig Config, topics []string, groupId string, callba
 		return nil, err
 	}
 
-	consumer, err := cluster.NewConsumer(strings.Split(kafkaConfig.Brokers, ","), groupId, topics, saramaConfig)
+	consumer, err := cluster.NewConsumer(kafkaConfig.Brokers, groupId, topics, saramaConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	schemaRegistryClient := NewCachedSchemaRegistryClient(strings.Split(kafkaConfig.SchemaRegistries, ","))
+	schemaRegistryClient := NewCachedSchemaRegistryClient(kafkaConfig.SchemaRegistries)
 	return &avroConsumer{
 		consumer,
 		schemaRegistryClient,
