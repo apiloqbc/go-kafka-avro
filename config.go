@@ -19,7 +19,6 @@ type Config struct {
 	Version  string `envconfig:"KAFKA_VERSION"`
 	Verbose  bool   `envconfig:"KAFKA_VERBOSE"`
 	ClientID string `envconfig:"KAFKA_CLIENT_ID"`
-	Topics   string `envconfig:"KAFKA_TOPICS"`
 
 	TLSEnabled bool   `envconfig:"KAFKA_TLS_ENABLED"`
 	TLSKey     string `envconfig:"KAFKA_TLS_KEY"`
@@ -27,7 +26,6 @@ type Config struct {
 	CACerts    string `envconfig:"KAFKA_CA_CERTS"`
 
 	// Consumer specific parameters
-	Group             string        `envconfig:"KAFKA_GROUP"`
 	RebalanceStrategy string        `envconfig:"KAFKA_REBALANCE_STRATEGY"`
 	RebalanceTimeout  time.Duration `envconfig:"KAFKA_REBALANCE_TIMEOUT"`
 	InitOffsets       string        `envconfig:"KAFKA_INIT_OFFSETS"`
@@ -45,7 +43,6 @@ func NewKafkaConfig() Config {
 	return Config{
 		Brokers:           "localhost:9092",
 		Version:           "1.1.0",
-		Group:             "default-group",
 		ClientID:          "sarama-easy",
 		RebalanceStrategy: "roundrobin",
 		RebalanceTimeout:  1 * time.Minute,

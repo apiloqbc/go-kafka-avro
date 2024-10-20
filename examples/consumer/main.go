@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	kafka "github.com/apiloqbc/go-kafka-avro"
+	"github.com/apiloqbc/go-kafka-avro"
 	"github.com/bsm/sarama-cluster"
 	"github.com/kelseyhightower/envconfig"
 	"log"
@@ -23,7 +23,6 @@ func init() {
 	// apply minimal config only for example run
 	flag.StringVar(&conf.Brokers, "brokers", conf.Brokers, "CSV list of Kafka seed brokers")
 	flag.StringVar(&conf.SchemaRegistries, "schema-registries", conf.SchemaRegistries, "CSV list of Kafka schema registries")
-	flag.StringVar(&conf.Topics, "topics", conf.Topics, "CSV list of Kafka topics to consume")
 	flag.BoolVar(&conf.Verbose, "verbose", conf.Verbose, "Enable detailed logging of Kafka client internals")
 	flag.BoolVar(&conf.TLSEnabled, "tls-enabled", conf.TLSEnabled, "Enable TLS encryption")
 	flag.BoolVar(&conf.SaslEnabled, "sasl-enabled", conf.SaslEnabled, "Enable SASL authentication")
@@ -50,7 +49,7 @@ func main() {
 		},
 	}
 
-	consumer, err := kafka.NewAvroConsumer(conf, topic, "consumer-group", consumerCallbacks)
+	consumer, err := kafka.NewAvroConsumer(conf, []string{"events"}, "consumer-group", consumerCallbacks)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

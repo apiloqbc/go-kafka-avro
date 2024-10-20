@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	kafka "github.com/apiloqbc/go-kafka-avro"
+	"github.com/apiloqbc/go-kafka-avro"
 	"github.com/kelseyhightower/envconfig"
 	"log"
 	"os"
@@ -23,7 +23,7 @@ func init() {
 	// apply minimal config only for example run
 	flag.StringVar(&conf.Brokers, "brokers", conf.Brokers, "CSV list of Kafka seed brokers")
 	flag.StringVar(&conf.SchemaRegistries, "schema-registries", conf.SchemaRegistries, "CSV list of Kafka schema registries")
-	flag.StringVar(&topic, "topics", "events", "CSV list of Kafka topics to consume")
+	flag.StringVar(&topic, "topic", "events", "CSV list of Kafka topics to consume")
 	flag.BoolVar(&conf.Verbose, "verbose", conf.Verbose, "Enable detailed logging of Kafka client internals")
 	flag.BoolVar(&conf.TLSEnabled, "tls-enabled", conf.TLSEnabled, "Enable TLS encryption")
 	flag.BoolVar(&conf.SaslEnabled, "sasl-enabled", conf.SaslEnabled, "Enable SASL authentication")
