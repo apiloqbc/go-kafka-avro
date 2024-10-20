@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/Shopify/sarama"
 	"github.com/linkedin/goavro/v2"
+	"strings"
 	"time"
 )
 
@@ -13,8 +14,12 @@ type AvroProducer struct {
 }
 
 // NewAvroProducer is a basic producer to interact with schema registry, avro and kafka
-func NewAvroProducer(kafkaServers []string, schemaRegistryServers []string) (*AvroProducer, error) {
+func NewAvroProducer(kafkaConfig Config) (*AvroProducer, error) {
 	config := sarama.NewConfig()
+
+	config.Net.TLS.Enable = kafkaConfig.TLSEnabled
+	configureProducerSasl(kafkaConfig, config)
+
 	config.Version = sarama.V2_0_1_0
 	config.Producer.Partitioner = sarama.NewHashPartitioner
 	config.Producer.RequiredAcks = sarama.WaitForAll
@@ -23,15 +28,19 @@ func NewAvroProducer(kafkaServers []string, schemaRegistryServers []string) (*Av
 	config.Producer.MaxMessageBytes = 10000000
 	config.Producer.Retry.Max = 10
 	config.Producer.Retry.Backoff = 1000 * time.Millisecond
-	producer, err := sarama.NewSyncProducer(kafkaServers, config)
+
+	if err := configureProducerTLS(kafkaConfig, config); err != nil {
+		return nil, err
+	}
+	producer, err := sarama.NewSyncProducer(strings.Split(kafkaConfig.Brokers, ","), config)
 	if err != nil {
 		return nil, err
 	}
-	schemaRegistryClient := NewCachedSchemaRegistryClient(schemaRegistryServers)
+	schemaRegistryClient := NewCachedSchemaRegistryClient(strings.Split(kafkaConfig.SchemaRegistries, ","))
 	return &AvroProducer{producer, schemaRegistryClient}, nil
 }
 
-//GetSchemaId get schema id from schema-registry service
+// GetSchemaId get schema id from schema-registry service
 func (ap *AvroProducer) GetSchemaId(topic string, avroCodec *goavro.Codec) (int, error) {
 	schemaId, err := ap.schemaRegistryClient.CreateSubject(topic+"-value", avroCodec)
 	if err != nil {

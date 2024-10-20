@@ -7,6 +7,7 @@ import (
 	"github.com/linkedin/goavro/v2"
 	"os"
 	"os/signal"
+	"strings"
 )
 
 type avroConsumer struct {
@@ -30,24 +31,31 @@ type Message struct {
 	Value     string
 }
 
-// avroConsumer is a basic consumer to interact with schema registry, avro and kafka
-func NewAvroConsumer(kafkaServers []string, schemaRegistryServers []string,
-	topic string, groupId string, callbacks ConsumerCallbacks) (*avroConsumer, error) {
-	// init (custom) config, enable errors and notifications
-	config := cluster.NewConfig()
-	config.Consumer.Fetch.Max = 2147483647
-	config.Consumer.Fetch.Default = 2147483647
-	config.Consumer.Return.Errors = true
-	config.Group.Return.Notifications = true
+// NewAvroConsumer avroConsumer is a basic consumer to interact with schema registry, avro and kafka
+func NewAvroConsumer(kafkaConfig Config, topics []string, groupId string, callbacks ConsumerCallbacks) (*avroConsumer, error) {
+	// init (custom) saramaConfig, enable errors and notifications
+	saramaConfig := cluster.NewConfig()
+
+	saramaConfig.Net.TLS.Enable = kafkaConfig.TLSEnabled
+	configureConsumerSasl(kafkaConfig, saramaConfig)
+
+	saramaConfig.Consumer.Fetch.Max = 2147483647
+	saramaConfig.Consumer.Fetch.Default = 2147483647
+	saramaConfig.Consumer.Return.Errors = true
+	saramaConfig.Group.Return.Notifications = true
 	//read from beginning at the first time
-	config.Consumer.Offsets.Initial = sarama.OffsetOldest
-	topics := []string{topic}
-	consumer, err := cluster.NewConsumer(kafkaServers, groupId, topics, config)
+	saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
+
+	if err := configureConsumerTLS(kafkaConfig, saramaConfig); err != nil {
+		return nil, err
+	}
+
+	consumer, err := cluster.NewConsumer(strings.Split(kafkaConfig.Brokers, ","), groupId, topics, saramaConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	schemaRegistryClient := NewCachedSchemaRegistryClient(schemaRegistryServers)
+	schemaRegistryClient := NewCachedSchemaRegistryClient(strings.Split(kafkaConfig.SchemaRegistries, ","))
 	return &avroConsumer{
 		consumer,
 		schemaRegistryClient,
@@ -55,7 +63,7 @@ func NewAvroConsumer(kafkaServers []string, schemaRegistryServers []string,
 	}, nil
 }
 
-//GetSchemaId get schema id from schema-registry service
+// GetSchema GetSchemaId get schema id from schema-registry service
 func (ac *avroConsumer) GetSchema(id int) (*goavro.Codec, error) {
 	codec, err := ac.SchemaRegistryClient.GetSchema(id)
 	if err != nil {
