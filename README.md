@@ -38,3 +38,4 @@ cd dangkaka/go-kafka-avro/examples
 * Encodes and decodes Avro data [goavro](https://github.com/linkedin/goavro)
 * Consumer group [sarama-cluster](https://github.com/bsm/sarama-cluster)
 * [schema-registry](https://github.com/confluentinc/schema-registry)
+
