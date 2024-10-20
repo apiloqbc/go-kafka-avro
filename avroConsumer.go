@@ -31,8 +31,8 @@ type Message struct {
 	Value     string
 }
 
-// avroConsumer is a basic consumer to interact with schema registry, avro and kafka
-func NewAvroConsumer(kafkaConfig Config, topic string, groupId string, callbacks ConsumerCallbacks) (*avroConsumer, error) {
+// NewAvroConsumer avroConsumer is a basic consumer to interact with schema registry, avro and kafka
+func NewAvroConsumer(kafkaConfig Config, topics []string, groupId string, callbacks ConsumerCallbacks) (*avroConsumer, error) {
 	// init (custom) saramaConfig, enable errors and notifications
 	saramaConfig := cluster.NewConfig()
 
@@ -45,7 +45,6 @@ func NewAvroConsumer(kafkaConfig Config, topic string, groupId string, callbacks
 	saramaConfig.Group.Return.Notifications = true
 	//read from beginning at the first time
 	saramaConfig.Consumer.Offsets.Initial = sarama.OffsetOldest
-	topics := []string{topic}
 
 	if err := configureConsumerTLS(kafkaConfig, saramaConfig); err != nil {
 		return nil, err
@@ -64,7 +63,7 @@ func NewAvroConsumer(kafkaConfig Config, topic string, groupId string, callbacks
 	}, nil
 }
 
-// GetSchemaId get schema id from schema-registry service
+// GetSchema GetSchemaId get schema id from schema-registry service
 func (ac *avroConsumer) GetSchema(id int) (*goavro.Codec, error) {
 	codec, err := ac.SchemaRegistryClient.GetSchema(id)
 	if err != nil {

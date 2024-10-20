@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.9.x
+  - 1.23.x
 
 before_install:
   - go get -t -v ./...
@@ -11,3 +11,20 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - |
+    # Check if we are on the master branch
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
+      # Configure Git user details for tagging
+      git config --local user.name "Travis CI"
+      git config --local user.email "travis@travis-ci.org"
+    
+      # Get the latest version tag and increment the patch version
+      VERSION_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+      NEXT_VERSION=$(echo $VERSION_TAG | awk -F. '{print $1"."$2"."$3+1}')
+    
+      # Create a new tag
+      git tag -a "v$NEXT_VERSION" -m "Automatic tag by Travis CI: v$NEXT_VERSION"
+    
+      # Push the new tag to GitHub using the GitHub token for authentication
+      git push https://$GITHUB_TOKEN@github.com/<user>/<repo>.git --tags
+    fi
